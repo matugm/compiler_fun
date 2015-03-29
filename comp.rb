@@ -28,6 +28,13 @@ end
 class DOUBLE_EQUALS < Struct.new(:content)
 end
 
+class PLUS < Struct.new(:content)
+end
+
+class PLUS_EQUALS < Struct.new(:content)
+end
+
+
 #@tokens = [...objects...]
 
 # symbolos > strings (peek == "") > numeros > letras (keyword / identifier)
@@ -58,6 +65,9 @@ require 'strscan'
 
 @buffer = StringScanner.new(
   'test = 2
+   abc  = 10
+   test = 500
+   test += 10
    puts(test)
    if test == 1 {
     while testing {
@@ -100,6 +110,11 @@ def find_keyword_or_identifier
   end
 end
 
+def check_for_addition
+  @buffer.getch
+  @buffer.getch == " " ? PLUS.new('+') : PLUS_EQUALS.new('+=')
+end
+
 def check_for_double_equals
   @buffer.getch
   @buffer.getch == " " ? SINGLE_EQUALS.new('=') : DOUBLE_EQUALS.new('==')
@@ -115,6 +130,7 @@ def parse
   when '{' then OPENING_BRACER.new(@buffer.getch)
   when '}' then CLOSING_BRACER.new(@buffer.getch)
   when '=' then check_for_double_equals
+  when '+' then check_for_addition
   when '"' then STRING.new(find_string)
   when /[0-9]/    then NUMBER.new(find_number)
   when /[a-zA-Z]/ then find_keyword_or_identifier
@@ -124,8 +140,9 @@ end
 
 @tokens = start
 p @tokens
-# "if (test == 1) { puts 'bingo' }"
 
+##########################################
+# Parser starts here
 ###########################################
 
 class IF_STATEMENT
@@ -145,6 +162,16 @@ class WHILE_STATEMENT
 end
 
 class ASSIGNMENT
+  attr_reader :variable, :value
+  def initialize(variable, value)
+    @variable = variable
+    @value    = value
+  end
+end
+
+class ASSIGNMENT_ADDITION
+  attr_reader :variable, :value
+  attr_accessor :value
   def initialize(variable, value)
     @variable = variable
     @value    = value
@@ -152,6 +179,7 @@ class ASSIGNMENT
 end
 
 class FUNCTION_CALL
+  attr_reader :function, :argument
   def initialize(function, argument)
     @function = function
     @argument = argument
@@ -204,7 +232,7 @@ def parse_all
 end
 
 def tag
-  tag1 || tag2 || tag3 || tag4|| tag99
+  tag1 || tag2 || tag3 || tag4 || tag5 || tag99
 end
 
 def tag1
@@ -239,6 +267,15 @@ def tag4
   end
 end
 
+def tag5
+  if look_ahead(IDENTIFIER) && look_ahead(PLUS_EQUALS, 1) && look_ahead(NUMBER, 2)
+    variable = term(IDENTIFIER)
+    term(PLUS_EQUALS)
+    value = term(NUMBER)
+    ASSIGNMENT_ADDITION.new(variable, value)
+  end
+end
+
 def tag99
   term(IDENTIFIER)
 end
@@ -268,17 +305,29 @@ def update_symbol_table(input)
 end
 
 def exec_from_symbol_table(input)
-  @symbol_table[input.content].call
+  args = @symbol_table[input.argument]
+  func = @symbol_table[input.function.to_sym]
+  func.call(args)
 end
 
 def execute
   instruction = @syntax_tree.shift
 
-  case instruction.class
-  when ASSIGNMENT then update_symbol_table(instruction)
-  when IDENTIFIER then exec_from_symbol_table(instruction)
+  if instruction.is_a? ASSIGNMENT
+    update_symbol_table(instruction)
+  end
+
+  if instruction.is_a? ASSIGNMENT_ADDITION
+    current_value = @symbol_table[instruction.variable]
+    instruction.value = instruction.value.to_i + current_value.to_i
+    update_symbol_table(instruction)
+  end
+
+  if instruction.is_a? FUNCTION_CALL
+    exec_from_symbol_table(instruction)
   end
 end
 
-p execute
-
+while @syntax_tree.any?
+  execute
+end
