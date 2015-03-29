@@ -280,7 +280,6 @@ def tag99
   term(IDENTIFIER)
 end
 
-# Se come los primeros aunque no formen una expresión
 def tag2
   if look_ahead(IDENTIFIER) && look_ahead(SINGLE_EQUALS, 1) && look_ahead(NUMBER, 2)
     variable = term(IDENTIFIER)
