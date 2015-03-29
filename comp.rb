@@ -1,190 +1,19 @@
-class NUMBER < Struct.new(:content)
-end
 
-class STRING < Struct.new(:content)
-end
+require_relative 'token_declarations'
+require_relative 'parser_declarations'
+require_relative 'test_code'
+require_relative 'lexer'
 
-class IDENTIFIER < Struct.new(:content)
-end
-
-class KEYWORD < Struct.new(:content)
-end
-
-class OPENING_PARAMS < Struct.new(:content)
-end
-
-class CLOSING_PARAMS < Struct.new(:content)
-end
-
-class OPENING_BRACER < Struct.new(:content)
-end
-
-class CLOSING_BRACER < Struct.new(:content)
-end
-
-class SINGLE_EQUALS < Struct.new(:content)
-end
-
-class DOUBLE_EQUALS < Struct.new(:content)
-end
-
-class PLUS < Struct.new(:content)
-end
-
-class PLUS_EQUALS < Struct.new(:content)
-end
-
-
-#@tokens = [...objects...]
-
+# @tokens = [...objects...]
 # symbolos > strings (peek == "") > numeros > letras (keyword / identifier)
 # 1 clase por token
 
-# recursive-descent parser
-require 'strscan'
-@buffer = StringScanner.new(
-  '(100) "testing!123"
-  if test == 1 {
-    while testing {
-      a = 3
-    }
-  }
-  ()'
-)
-
-@buffer = StringScanner.new(
-  'test = 1
-   abc  = 3
-   if test == 1 {
-     while testing {
-       a = 3
-     }
-   puts (abc)
-  }'
-)
-
-@buffer = StringScanner.new(
-  'test = 2
-   abc  = 10
-   test = 500
-   test += 10
-   puts(test)
-   if test == 1 {
-    while testing {
-      a = 3
-    }
-   }'
-)
-
-@tokens = []
-
-def start
-  until @buffer.eos?
-    @tokens << parse
-  end
-
-  @tokens
-end
-
-def skip_spaces
-  @buffer.skip(/\s+/)
-end
-
-def find_number
-  result = @buffer.scan(/\d+/)
-end
-
-def find_string
-  @buffer.getch
-  @buffer.scan_until(/"/).chop
-end
-
-KEYWORDS = %w(if unless while until def)
-def find_keyword_or_identifier
-  word = @buffer.scan(/\w+/)
-
-  if KEYWORDS.include? word
-    KEYWORD.new word
-  else
-    IDENTIFIER.new word
-  end
-end
-
-def check_for_addition
-  @buffer.getch
-  @buffer.getch == " " ? PLUS.new('+') : PLUS_EQUALS.new('+=')
-end
-
-def check_for_double_equals
-  @buffer.getch
-  @buffer.getch == " " ? SINGLE_EQUALS.new('=') : DOUBLE_EQUALS.new('==')
-end
-
-def parse
-  skip_spaces
-  peek = @buffer.peek(1)
-
-  case peek
-  when '(' then OPENING_PARAMS.new(@buffer.getch)
-  when ')' then CLOSING_PARAMS.new(@buffer.getch)
-  when '{' then OPENING_BRACER.new(@buffer.getch)
-  when '}' then CLOSING_BRACER.new(@buffer.getch)
-  when '=' then check_for_double_equals
-  when '+' then check_for_addition
-  when '"' then STRING.new(find_string)
-  when /[0-9]/    then NUMBER.new(find_number)
-  when /[a-zA-Z]/ then find_keyword_or_identifier
-  else abort "Invalid syntax at position #{@buffer.pos} '#{peek}'"
-  end
-end
-
-@tokens = start
+@tokens = Lexer.new(@buffer).tokens
 p @tokens
 
 ##########################################
-# Parser starts here
+# Parser starts here (recursive-descent)
 ###########################################
-
-class IF_STATEMENT
-  attr_accessor :body
-
-  def initialize(condition)
-    @condition = condition
-  end
-end
-
-class WHILE_STATEMENT
-  attr_accessor :body
-
-  def initialize(condition)
-    @condition = condition
-  end
-end
-
-class ASSIGNMENT
-  attr_reader :variable, :value
-  def initialize(variable, value)
-    @variable = variable
-    @value    = value
-  end
-end
-
-class ASSIGNMENT_ADDITION
-  attr_reader :variable, :value
-  attr_accessor :value
-  def initialize(variable, value)
-    @variable = variable
-    @value    = value
-  end
-end
-
-class FUNCTION_CALL
-  attr_reader :function, :argument
-  def initialize(function, argument)
-    @function = function
-    @argument = argument
-  end
-end
 
 @debug = false
 
@@ -293,7 +122,9 @@ end
 puts "\n******** output *********\n\n"
 p @syntax_tree
 
-##############################
+################################
+# Interpreter starts here
+################################
 
 @symbol_table = {
   puts: ->(s) { puts s }
