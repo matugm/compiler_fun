@@ -10,7 +10,7 @@ class Interpreter
   end
 
   def get_from_symbol_table(input)
-    @symbol_table.fetch(input) { abort "Symbol not found: #{input}" }
+    @symbol_table.fetch(input) {  }
   end
 
   def exec_from_symbol_table(input)
@@ -19,8 +19,33 @@ class Interpreter
     func.call(args)
   end
 
+  def evaluate_condition(input)
+    op = input.condition[1]
+    left_hand  = input.condition[0]
+    right_hand = input.condition[2]
+
+    if op.class == DOUBLE_EQUALS
+      if left_hand == right_hand
+        @syntax_tree.unshift input.body
+      end
+    end
+
+    # if op.class == LESSER_THAN
+    #   if left_hand < right_hand
+    #     @syntax_tree.unshift input.body
+    #   end
+    # end
+    #
+    # if op.class == GREATER_THAN
+    #   if left_hand > right_hand
+    #     @syntax_tree.unshift input.body
+    #   end
+    # end
+  end
+
   def execute
     instruction = @syntax_tree.shift
+    #puts "Current instruction: #{instruction}"
 
     if instruction.is_a? ASSIGNMENT
       update_symbol_table(instruction)
@@ -34,6 +59,10 @@ class Interpreter
 
     if instruction.is_a? FUNCTION_CALL
       exec_from_symbol_table(instruction)
+    end
+
+    if instruction.is_a? IF_STATEMENT
+      evaluate_condition(instruction)
     end
   end
 

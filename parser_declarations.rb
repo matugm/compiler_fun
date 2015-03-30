@@ -1,5 +1,6 @@
 class IF_STATEMENT
   attr_accessor :body
+  attr_reader   :condition
 
   def initialize(condition)
     @condition = condition
