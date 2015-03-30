@@ -21,12 +21,12 @@ class Interpreter
 
   def evaluate_condition(input)
     op = input.condition[1]
-    left_hand  = input.condition[0]
-    right_hand = input.condition[2]
+    left_hand  = input.condition[0].content
+    right_hand = input.condition[2].content
 
     if op.class == DOUBLE_EQUALS
       if left_hand == right_hand
-        @syntax_tree.unshift input.body
+        @syntax_tree.unshift(input.body)
       end
     end
 

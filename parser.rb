@@ -1,11 +1,12 @@
 class Parser
   def initialize(tokens)
     @tokens = tokens
-    @debug = false
+    @debug  = false
   end
 
   def print_tree(ast)
-    p ast.map(&:class)
+    puts
+    p ast
   end
 
   def term(tok)
@@ -14,7 +15,7 @@ class Parser
     puts "Token: #{tok}" if @debug
 
     if current.class == tok || current.content == tok
-      puts "Current: #{current}" if @debug
+      puts "Current: #{current} - Value: #{current.content}" if @debug
       current.content
     else
       @tokens.unshift current
@@ -46,6 +47,7 @@ class Parser
     while @tokens.any?
       ast << tag
     end
+    print_tree(ast) if @debug
     ast
   end
 

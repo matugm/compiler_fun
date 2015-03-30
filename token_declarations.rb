@@ -1,35 +1,17 @@
-class NUMBER < Struct.new(:content)
-end
 
-class STRING < Struct.new(:content)
-end
+token_list = %w(
+  NUMBER STRING IDENTIFIER KEYWORD
+  OPENING_PARAMS CLOSING_PARAMS
+  OPENING_BRACER CLOSING_BRACER
+  SINGLE_EQUALS DOUBLE_EQUALS
+  LESSER_THAN GREATER_THAN
+  PLUS PLUS_EQUALS
+)
 
-class IDENTIFIER < Struct.new(:content)
-end
-
-class KEYWORD < Struct.new(:content)
-end
-
-class OPENING_PARAMS < Struct.new(:content)
-end
-
-class CLOSING_PARAMS < Struct.new(:content)
-end
-
-class OPENING_BRACER < Struct.new(:content)
-end
-
-class CLOSING_BRACER < Struct.new(:content)
-end
-
-class SINGLE_EQUALS < Struct.new(:content)
-end
-
-class DOUBLE_EQUALS < Struct.new(:content)
-end
-
-class PLUS < Struct.new(:content)
-end
-
-class PLUS_EQUALS < Struct.new(:content)
+token_list.each do |tok|
+  klass = Object.const_set(tok, Class.new)
+  klass.class_eval do
+    attr_accessor :content
+    define_method(:initialize) { |con| @content = con }
+  end
 end
