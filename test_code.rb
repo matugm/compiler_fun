@@ -46,28 +46,28 @@ describe Parser do
     syntax_tree = get_ast('abc = 50')
     expect(syntax_tree.first).to be_a ASSIGNMENT
   end
+
+  it "can generate a correct syntax tree" do
+    syntax_tree = get_ast(
+      'test = 2
+       abc  = 10
+       test = 500
+       test += 10
+       puts(test)
+       if test == 1 {
+        while testing {
+          a = 3
+        }
+       }'
+    )
+
+    expect(syntax_tree.first).to be_a ASSIGNMENT
+    expect(syntax_tree[1]).to be_a ASSIGNMENT
+    expect(syntax_tree[2]).to be_a ASSIGNMENT
+    expect(syntax_tree[3]).to be_a ASSIGNMENT_ADDITION
+    expect(syntax_tree[4]).to be_a FUNCTION_CALL
+    expect(syntax_tree[5]).to be_a IF_STATEMENT
+    expect(syntax_tree[5].body).to be_a WHILE_STATEMENT
+    expect(syntax_tree[5].body.body).to be_a ASSIGNMENT
+  end
 end
-
-@buffer = StringScanner.new(
-  'test = 1
-   abc  = 3
-   if test == 1 {
-     while testing {
-       a = 3
-     }
-   puts (abc)
-  }'
-)
-
-@buffer = StringScanner.new(
-  'test = 2
-   abc  = 10
-   test = 500
-   test += 10
-   puts(test)
-   if test == 1 {
-    while testing {
-      a = 3
-    }
-   }'
-)

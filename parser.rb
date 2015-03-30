@@ -6,11 +6,11 @@ class Parser
 
   def term(tok)
     current = @tokens.shift
-    abort "nil token" unless current
+    abort "Parser: nil token found" unless current
     puts "Token: #{tok}" if @debug
 
     if current.class == tok || current.content == tok
-      p "Current: #{current}" if @debug
+      puts "Current: #{current}" if @debug
       current.content
     else
       @tokens.unshift current
@@ -29,7 +29,7 @@ class Parser
   def find_condition
     condition = []
 
-    p "Condition: #{condition}" if @debug
+    puts "Condition: #{condition}" if @debug
     until term(OPENING_BRACER)
       condition << @tokens.shift
     end
@@ -46,10 +46,10 @@ class Parser
   end
 
   def tag
-    tag1 || tag2 || tag3 || tag4 || tag5 || tag99
+    find_if || find_assignment || find_function_call || find_while || find_assignment_addition || tag99
   end
 
-  def tag1
+  def find_if
     if term("if")
       t = IF_STATEMENT.new(find_condition)
 
@@ -60,7 +60,7 @@ class Parser
     end
   end
 
-  def tag3
+  def find_function_call
     if look_ahead(IDENTIFIER) && look_ahead(OPENING_PARAMS, 1) && look_ahead(IDENTIFIER, 2) && look_ahead(CLOSING_PARAMS, 3)
       func = term(IDENTIFIER)
       term(OPENING_PARAMS)
@@ -70,7 +70,7 @@ class Parser
     end
   end
 
-  def tag4
+  def find_while
     if term("while")
       t = WHILE_STATEMENT.new(find_condition)
 
@@ -81,7 +81,7 @@ class Parser
     end
   end
 
-  def tag5
+  def find_assignment_addition
     if look_ahead(IDENTIFIER) && look_ahead(PLUS_EQUALS, 1) && look_ahead(NUMBER, 2)
       variable = term(IDENTIFIER)
       term(PLUS_EQUALS)
@@ -94,7 +94,7 @@ class Parser
     term(IDENTIFIER)
   end
 
-  def tag2
+  def find_assignment
     if look_ahead(IDENTIFIER) && look_ahead(SINGLE_EQUALS, 1) && look_ahead(NUMBER, 2)
       variable = term(IDENTIFIER)
       term(SINGLE_EQUALS)
