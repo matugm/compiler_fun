@@ -6,6 +6,8 @@ require_relative 'token_declarations'
 require_relative 'parser'
 require_relative 'parser_declarations'
 
+require_relative 'interpreter'
+
 def get_tokens(input)
   @buffer = StringScanner.new input
   Lexer.new(@buffer).tokens
@@ -69,5 +71,23 @@ describe Parser do
     expect(syntax_tree[5]).to be_a IF_STATEMENT
     expect(syntax_tree[5].body).to be_a WHILE_STATEMENT
     expect(syntax_tree[5].body.body).to be_a ASSIGNMENT
+  end
+end
+
+describe Interpreter do
+  it "can save variables and execute built-in methods" do
+    syntax_tree = get_ast("
+    abc = 50
+    puts(abc)")
+
+    expect { Interpreter.new(syntax_tree) }.to output("50\n").to_stdout
+  end
+
+  it "can evaluate an if expression" do
+    syntax_tree = get_ast("
+    if 10 == 10 { abc = 40 }
+    puts(abc)")
+
+    expect { Interpreter.new(syntax_tree) }.to output("40\n").to_stdout
   end
 end

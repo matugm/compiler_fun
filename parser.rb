@@ -4,6 +4,10 @@ class Parser
     @debug = false
   end
 
+  def print_tree(ast)
+    p ast.map(&:class)
+  end
+
   def term(tok)
     current = @tokens.shift
     abort "Parser: nil token found" unless current

@@ -9,9 +9,13 @@ class Interpreter
     @symbol_table[input.variable] = input.value
   end
 
+  def get_from_symbol_table(input)
+    @symbol_table.fetch(input) { abort "Symbol not found: #{input}" }
+  end
+
   def exec_from_symbol_table(input)
-    args = @symbol_table[input.argument]
-    func = @symbol_table[input.function.to_sym]
+    args = get_from_symbol_table(input.argument)
+    func = get_from_symbol_table(input.function.to_sym)
     func.call(args)
   end
 
