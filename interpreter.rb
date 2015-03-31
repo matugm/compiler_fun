@@ -30,17 +30,17 @@ class Interpreter
       end
     end
 
-    # if op.class == LESSER_THAN
-    #   if left_hand < right_hand
-    #     @syntax_tree.unshift input.body
-    #   end
-    # end
-    #
-    # if op.class == GREATER_THAN
-    #   if left_hand > right_hand
-    #     @syntax_tree.unshift input.body
-    #   end
-    # end
+    if op.class == LESSER_THAN
+      if left_hand < right_hand
+        @syntax_tree.unshift input.body
+      end
+    end
+
+    if op.class == GREATER_THAN
+      if left_hand > right_hand
+        @syntax_tree.unshift input.body
+      end
+    end
   end
 
   def execute

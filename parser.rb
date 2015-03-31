@@ -86,7 +86,7 @@ class Parser
       return t
     end
   end
-
+  # TokenSequence class
   def find_assignment_addition
     if look_ahead(IDENTIFIER) && look_ahead(PLUS_EQUALS, 1) && look_ahead(NUMBER, 2)
       variable = term(IDENTIFIER)

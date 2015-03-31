@@ -59,6 +59,8 @@ class Lexer
     when ')' then CLOSING_PARAMS.new(@buffer.getch)
     when '{' then OPENING_BRACER.new(@buffer.getch)
     when '}' then CLOSING_BRACER.new(@buffer.getch)
+    when '>' then GREATER_THAN.new(@buffer.getch)
+    when '<' then LESSER_THAN.new(@buffer.getch)
     when '=' then check_for_double_equals
     when '+' then check_for_addition
     when '"' then STRING.new(find_string)
