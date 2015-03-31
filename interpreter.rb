@@ -6,7 +6,11 @@ class Interpreter
   end
 
   def update_symbol_table(input)
-    @symbol_table[input.variable] = input.value
+    if input.is_a? NUMBER
+      @symbol_table[input.variable] = input.value.to_i
+    else
+      @symbol_table[input.variable] = input.value
+    end
   end
 
   def get_from_symbol_table(input)

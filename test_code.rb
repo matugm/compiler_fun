@@ -86,9 +86,17 @@ describe Interpreter do
 
   it "can evaluate an if expression" do
     syntax_tree = get_ast("
-    if 10 == 10 { abc = 40 }
+    if 20 > 10 { abc = 40 }
     puts(abc)")
 
     expect { Interpreter.new(syntax_tree) }.to output("40\n").to_stdout
+  end
+
+  it "can have a string as a variable value" do
+    syntax_tree = get_ast('
+    str = "testing"
+    puts(str)')
+
+    expect { Interpreter.new(syntax_tree) }.to output("testing\n").to_stdout
   end
 end
