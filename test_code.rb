@@ -77,7 +77,8 @@ end
 describe Interpreter do
   it "can save variables and execute built-in methods" do
     syntax_tree = get_ast("
-    abc = 50
+    abc  = 30
+    abc += 20
     puts(abc)")
 
     expect { Interpreter.new(syntax_tree) }.to output("50\n").to_stdout

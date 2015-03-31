@@ -86,7 +86,7 @@ class Parser
       return t
     end
   end
-  # TokenSequence class
+
   def find_assignment_addition
     if (tokens = TokenSequence.find(self, IDENTIFIER, PLUS_EQUALS, NUMBER))
       ASSIGNMENT_ADDITION.new(tokens[0], tokens[2])
@@ -98,25 +98,20 @@ class Parser
   end
 
   def find_assignment
-    if look_ahead(IDENTIFIER) && look_ahead(SINGLE_EQUALS, 1) && look_ahead(NUMBER, 2)
-      variable = term(IDENTIFIER)
-      term(SINGLE_EQUALS)
-      value = term(NUMBER)
-      ASSIGNMENT.new(variable, value)
+    if (tokens = TokenSequence.find(self, IDENTIFIER, SINGLE_EQUALS, NUMBER))
+      ASSIGNMENT.new(tokens[0], tokens[2])
     end
   end
 end
 
 class TokenSequence
   def self.find(parser, *tokens)
-    indx = -1
 
     found =
-    tokens.all? do |t|
-      indx += 1
-      parser.look_ahead(t, indx)
+    tokens.each_with_index.all? do |t, idx|
+      parser.look_ahead(t, idx)
     end
 
-    tokens.each { |t| parser.term(t) } if found
+    tokens.map { |t| parser.term(t) } if found
   end
 end
