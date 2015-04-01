@@ -33,6 +33,15 @@ class ASSIGNMENT_ADDITION
   end
 end
 
+class ASSIGNMENT_SUBSTRACTION
+  attr_reader :variable, :value
+  attr_accessor :value
+  def initialize(variable, value)
+    @variable = variable
+    @value    = value
+  end
+end
+
 class FUNCTION_CALL
   attr_reader :function, :argument
   def initialize(function, argument)

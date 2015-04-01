@@ -45,6 +45,11 @@ class Lexer
     @buffer.getch == " " ? PLUS.new('+') : PLUS_EQUALS.new('+=')
   end
 
+  def check_for_substraction
+    @buffer.getch
+    @buffer.getch == " " ? MINUS.new('-') : MINUS_EQUALS.new('-=')
+  end
+
   def check_for_double_equals
     @buffer.getch
     @buffer.getch == " " ? SINGLE_EQUALS.new('=') : DOUBLE_EQUALS.new('==')
@@ -63,6 +68,7 @@ class Lexer
     when '<' then LESSER_THAN.new(@buffer.getch)
     when '=' then check_for_double_equals
     when '+' then check_for_addition
+    when '-' then check_for_substraction
     when '"' then STRING.new(find_string)
     when /[0-9]/    then NUMBER.new(find_number)
     when /[a-zA-Z]/ then find_keyword_or_identifier

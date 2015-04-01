@@ -53,7 +53,9 @@ class Parser
   end
 
   def tag
-    find_if || find_assignment || find_function_call || find_while || find_assignment_addition || tag99
+    find_if || find_assignment || find_function_call ||
+    find_while || find_assignment_addition ||
+    find_assignment_substraction || tag99
   end
 
   def find_if
@@ -97,6 +99,12 @@ class Parser
   def find_assignment_addition
     if (tokens = TokenSequence.find(self, IDENTIFIER, PLUS_EQUALS, NUMBER))
       ASSIGNMENT_ADDITION.new(tokens[0], tokens[2])
+    end
+  end
+
+  def find_assignment_substraction
+    if (tokens = TokenSequence.find(self, IDENTIFIER, MINUS_EQUALS, NUMBER))
+      ASSIGNMENT_SUBSTRACTION.new(tokens[0], tokens[2])
     end
   end
 
