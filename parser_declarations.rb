@@ -9,6 +9,7 @@ end
 
 class WHILE_STATEMENT
   attr_accessor :body
+  attr_reader   :condition
 
   def initialize(condition)
     @condition = condition

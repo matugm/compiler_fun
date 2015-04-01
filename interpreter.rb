@@ -23,27 +23,29 @@ class Interpreter
     func.call(args)
   end
 
+  def get_value(val)
+    if val.is_a? IDENTIFIER
+      get_from_symbol_table(val.content)
+    else
+      val.content
+    end
+  end
+
   def evaluate_condition(input)
     op = input.condition[1]
-    left_hand  = input.condition[0].content
-    right_hand = input.condition[2].content
+    left_hand  = get_value(input.condition[0]).to_i
+    right_hand = get_value(input.condition[2]).to_i
 
     if op.class == DOUBLE_EQUALS
-      if left_hand == right_hand
-        @syntax_tree.unshift(input.body)
-      end
+      return left_hand == right_hand
     end
 
     if op.class == LESSER_THAN
-      if left_hand < right_hand
-        @syntax_tree.unshift input.body
-      end
+      return left_hand < right_hand
     end
 
     if op.class == GREATER_THAN
-      if left_hand > right_hand
-        @syntax_tree.unshift input.body
-      end
+      return left_hand > right_hand
     end
   end
 
@@ -57,8 +59,8 @@ class Interpreter
 
     if instruction.is_a? ASSIGNMENT_ADDITION
       current_value = @symbol_table[instruction.variable]
-      instruction.value = instruction.value.to_i + current_value.to_i
-      update_symbol_table(instruction)
+      new_value = current_value.to_i + instruction.value.to_i
+      @symbol_table[instruction.variable] = new_value
     end
 
     if instruction.is_a? FUNCTION_CALL
@@ -66,7 +68,16 @@ class Interpreter
     end
 
     if instruction.is_a? IF_STATEMENT
-      evaluate_condition(instruction)
+      bool = evaluate_condition(instruction)
+      @syntax_tree.unshift(instruction.body) if bool
+    end
+
+    if instruction.is_a? WHILE_STATEMENT
+      bool = evaluate_condition(instruction)
+      if bool
+        @syntax_tree.unshift(instruction)
+        @syntax_tree.unshift(instruction.body)
+      end
     end
   end
 

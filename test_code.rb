@@ -99,4 +99,15 @@ describe Interpreter do
 
     expect { Interpreter.new(syntax_tree) }.to output("testing\n").to_stdout
   end
+
+  it "can run a while loop" do
+    syntax_tree = get_ast("
+    count = 0
+    while count < 100 {
+      count += 10
+    }
+    puts(count)")
+
+    expect { Interpreter.new(syntax_tree) }.to output("100\n").to_stdout
+  end
 end
