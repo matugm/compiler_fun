@@ -20,7 +20,6 @@ class Parser
     else
       @tokens.unshift current
       false
-      #abort "Expected #{tok} but #{current} was found instead."
     end
   end
 
@@ -45,7 +44,9 @@ class Parser
   def parse_all
     ast = []
     while @tokens.any?
-      ast << tag
+      expression = tag
+      abort "Parsing error, no valid expression found:\n #{@tokens}" unless expression
+      ast << expression
     end
     print_tree(ast) if @debug
     ast
@@ -66,16 +67,6 @@ class Parser
     end
   end
 
-  def find_function_call
-    if look_ahead(IDENTIFIER) && look_ahead(OPENING_PARAMS, 1) && look_ahead(IDENTIFIER, 2) && look_ahead(CLOSING_PARAMS, 3)
-      func = term(IDENTIFIER)
-      term(OPENING_PARAMS)
-      args = term(IDENTIFIER)
-      term(CLOSING_PARAMS)
-      FUNCTION_CALL.new(func, args)
-    end
-  end
-
   def find_while
     if term("while")
       t = WHILE_STATEMENT.new(find_condition)
@@ -84,6 +75,22 @@ class Parser
 
       term(CLOSING_BRACER)
       return t
+    end
+  end
+
+  def find_function_call
+    if (tokens = TokenSequence.find(self, IDENTIFIER, OPENING_PARAMS, IDENTIFIER, CLOSING_PARAMS))
+      FUNCTION_CALL.new(tokens[0], tokens[2])
+    end
+  end
+
+  def find_assignment
+    if (tokens = TokenSequence.find(self, IDENTIFIER, SINGLE_EQUALS, NUMBER))
+      return ASSIGNMENT.new(tokens[0], tokens[2])
+    end
+
+    if (tokens = TokenSequence.find(self, IDENTIFIER, SINGLE_EQUALS, STRING))
+      return ASSIGNMENT.new(tokens[0], tokens[2])
     end
   end
 
@@ -97,11 +104,6 @@ class Parser
     term(IDENTIFIER)
   end
 
-  def find_assignment
-    if (tokens = TokenSequence.find(self, IDENTIFIER, SINGLE_EQUALS, NUMBER))
-      ASSIGNMENT.new(tokens[0], tokens[2])
-    end
-  end
 end
 
 class TokenSequence
