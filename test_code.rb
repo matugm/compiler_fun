@@ -6,7 +6,7 @@ require_relative 'token_declarations'
 require_relative 'parser'
 require_relative 'parser_declarations'
 
-require_relative 'interpreter'
+require_relative 'llvm_interpreter'
 
 def get_tokens(input)
   @buffer = StringScanner.new input
@@ -78,17 +78,17 @@ describe Interpreter do
   it "can save variables and execute built-in methods" do
     syntax_tree = get_ast("
     abc  = 30
-    abc += 20
     puts(abc)")
 
-    expect { Interpreter.new(syntax_tree) }.to output("50\n").to_stdout
+    expect { Interpreter.new(syntax_tree) }.to output("30\n").to_stdout
   end
 
   it "can evaluate an if expression" do
     syntax_tree = get_ast("
-    if 20 > 10 { abc = 40 }
+    if 20 > 15 { abc = 40 }
     puts(abc)")
 
+    Interpreter.new(syntax_tree)
     expect { Interpreter.new(syntax_tree) }.to output("40\n").to_stdout
   end
 

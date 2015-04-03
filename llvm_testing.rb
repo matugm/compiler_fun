@@ -21,6 +21,11 @@ build = Builder.new
 build.position_at_end(block)
 adder = build.add(main.params[0], LLVM::Int(5))
 
+# Local variables
+var = build.alloca(INT)
+build.store(LLVM::Int(10), var)
+p build.load(var)
+
 # Build string and call puts
 str = build.global_string_pointer("testing")
 build.call(puts_c, str)
