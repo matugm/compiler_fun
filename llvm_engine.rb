@@ -71,6 +71,7 @@ class LLVM_Engine
     #
   end
 
+  # int -> string (i32 -> i8*)
   def execute_method(name, *args)
     func = @mod.functions.named(name)
     ptr  = @locals.fetch(args.first) { abort "Invalid local variable - #{args.first}" }
@@ -110,9 +111,30 @@ class LLVM_Engine
     @builder = builder_from_block(@after_block)
   end
 
+  def end_while
+    builder_from_block(@true_block).br(@condition_block)
+    @builder = builder_from_block(@after_block)
+  end
+
+  def evaluate_while(input)
+    cmp = evaluate_condition(input)
+
+    @true_block  = get_block('true_block')
+    @after_block = get_block('after_block')
+
+    @builder.cond(cmp, @true_block, @after_block)
+
+    @builder = builder_from_block(@true_block)
+  end
+
   # icmp(pred, lhs, rhs, name = "") ⇒ LLVM::Instruction
   # cond(cond, iftrue, iffalse) ⇒ LLVM::Instruction
   def evaluate_condition(input)
+    @condition_block = get_block('condition_block')
+    @builder.br(@condition_block)
+
+    @builder = builder_from_block(@condition_block)
+
     op = input.condition[1]
     left_hand  = get_value(input.condition[0])
     right_hand = get_value(input.condition[2])

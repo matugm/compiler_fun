@@ -25,12 +25,19 @@ class Interpreter
     end
 
     if instruction.is_a? WHILE_STATEMENT
-      # pending implementation
+      @engine.evaluate_while(instruction)
+      @syntax_tree.unshift(instruction.body)
+      @while = true and return
     end
 
     if @depth
       @engine.end_block
       @depth = false
+    end
+
+    if @while
+      @engine.end_while
+      @while = false
     end
   end
 

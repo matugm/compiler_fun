@@ -83,7 +83,7 @@ describe Interpreter do
     expect { Interpreter.new(syntax_tree) }.to output("30\n").to_stdout
   end
 
-  it "can evaluate an if expression" do
+  xit "can evaluate an if expression" do
     syntax_tree = get_ast('
     abc = "AAA"
     if 100 > 15 { abc = "CCC" }
@@ -101,13 +101,12 @@ describe Interpreter do
     expect { Interpreter.new(syntax_tree) }.to output("testing\n").to_stdout
   end
 
-  xit "can run a while loop" do
-    syntax_tree = get_ast("
-    count = 0
+  it "can run a while loop" do
+    syntax_tree = get_ast('
+    count = 120
     while count < 100 {
-      count += 10
-    }
-    puts(count)")
+      puts(count)
+    }')
 
     expect { Interpreter.new(syntax_tree) }.to output("100\n").to_stdout
   end
