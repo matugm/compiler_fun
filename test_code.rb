@@ -75,10 +75,10 @@ describe Parser do
 end
 
 describe Interpreter do
-  xit "can save variables and execute built-in methods" do
+  it "can save variables and execute built-in methods" do
     syntax_tree = get_ast("
     abc  = 30
-    puts(abc)")
+    abc += 20")
 
     expect { Interpreter.new(syntax_tree) }.to output("30\n").to_stdout
   end
@@ -101,7 +101,7 @@ describe Interpreter do
     expect { Interpreter.new(syntax_tree) }.to output("testing\n").to_stdout
   end
 
-  it "can run a while loop" do
+  xit "can run a while loop" do
     syntax_tree = get_ast('
     count = 120
     while count < 100 {

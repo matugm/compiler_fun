@@ -68,7 +68,10 @@ class LLVM_Engine
   end
 
   def variable_add(inst)
-    #
+    ptr = @locals.fetch(inst.variable)
+    val = @builder.load(ptr)
+    new_val = @builder.add(val, LLVM::Int(inst.value.to_i))
+    @builder.store(new_val, ptr)
   end
 
   # int -> string (i32 -> i8*)
