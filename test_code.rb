@@ -78,12 +78,13 @@ describe Interpreter do
   it "can save variables and execute built-in methods" do
     syntax_tree = get_ast("
     abc  = 30
-    abc += 20")
+    abc += 20
+    puts(abc)")
 
     expect { Interpreter.new(syntax_tree) }.to output("30\n").to_stdout
   end
 
-  xit "can evaluate an if expression" do
+  it "can evaluate an if expression" do
     syntax_tree = get_ast('
     abc = "AAA"
     if 100 > 15 { abc = "CCC" }

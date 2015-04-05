@@ -5,6 +5,7 @@ class LLVM_Engine
   include LLVM
 
   INT   = LLVM::Int
+  CHAR  = LLVM::Int8
   PCHAR = LLVM::Pointer(LLVM::Int8)
 
   def initialize
@@ -13,9 +14,11 @@ class LLVM_Engine
     # function -> name, arguments, output type
     @main    = @mod.functions.add('main', [INT], INT)
     @puts_c  = @mod.functions.add('puts', [PCHAR], INT)
+    @printf  = @mod.functions.add('sprintf', [PCHAR, PCHAR], INT, varargs: true)
     @builder = generate_builder(@main)
     @locals  = {}
 
+    @type_map = {}
     @block_counter = 0
   end
 
@@ -43,18 +46,21 @@ class LLVM_Engine
       if value.to_i > 0
         ptr = @builder.alloca(INT)
         @builder.store(LLVM::Int(value.to_i), ptr)
+        @type_map[inst.variable] = "int"
       else
         ptr   = define_string(value)
         alloc = @builder.alloca(PCHAR)
         ptr = @builder.store(@builder.gep(ptr, LLVM::Int(0)), alloc)
         ptr = alloc
+        @type_map[inst.variable] = "string"
       end
 
       @locals[inst.variable] = ptr
       return
     }
 
-    # If var already exist, don't change @locals here
+    # If var already exist store the updated value
+    # don't change @locals here
     if value.to_i > 0
       @builder.store(LLVM::Int(value.to_i), var)
     else
@@ -74,18 +80,49 @@ class LLVM_Engine
     @builder.store(new_val, ptr)
   end
 
-  # int -> string (i32 -> i8*)
+  def convert_to_string(val)
+    #alloca = @builder.alloca(LLVM::Array(CHAR, 20), "char_array")
+    alloca = @builder.alloca(PCHAR, "char_pointer")
+
+    ptr    = @builder.load(alloca)
+
+    func   = @mod.functions.named("sprintf")
+    str_format = define_string("%d")
+
+    val  = @builder.load(val)
+    @builder.call(func, ptr, str_format, val)
+    ptr
+  end
+
+  def prepare_for_puts(ptr, var_name)
+    if @type_map[var_name] == "int"
+      convert_to_string(ptr)
+    else
+       @builder.load(ptr)
+    end
+  end
+
+  def fetch_local(name)
+    @locals.fetch(name) { abort "Invalid local variable - #{name}" }
+  end
+
   def execute_method(name, *args)
     func = @mod.functions.named(name)
-    ptr  = @locals.fetch(args.first) { abort "Invalid local variable - #{args.first}" }
-    val  = @builder.load(ptr)
-    @builder.call(func, val)
+    ptr  = fetch_local(args.first)
+
+    if name == "puts"
+      str = prepare_for_puts(ptr, args.first)
+      @builder.call(func, str)
+    else
+      val  = @builder.load(ptr)
+      @builder.call(func, val)
+    end
   end
 
   # Dereferences pointer to value
   def get_value(val)
     if val.is_a? IDENTIFIER
-      var = @locals.fetch(val.content) { abort "Invalid local variable - #{val}" }
+      var = fetch_local(val.content)
       @builder.load(var)
     else
       ptr = @builder.alloca(INT)
