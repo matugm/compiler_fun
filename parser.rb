@@ -58,6 +58,8 @@ class Parser
     find_assignment_substraction || tag99
   end
 
+  # limitations: only 1 expression inside the if block
+  # easily solved using 'until CLOSING_BRACER'
   def find_if
     if term("if")
       t = IF_STATEMENT.new(find_condition)
