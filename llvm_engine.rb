@@ -42,20 +42,7 @@ class LLVM_Engine
     value = inst.value
 
     var = @locals.fetch(inst.variable) {
-
-      if value.to_i > 0
-        ptr = @builder.alloca(INT)
-        @builder.store(LLVM::Int(value.to_i), ptr)
-        @type_map[inst.variable] = "int"
-      else
-        ptr   = define_string(value)
-        alloc = @builder.alloca(PCHAR)
-        ptr = @builder.store(@builder.gep(ptr, LLVM::Int(0)), alloc)
-        ptr = alloc
-        @type_map[inst.variable] = "string"
-      end
-
-      @locals[inst.variable] = ptr
+      @locals[inst.variable] = create_new_variable(inst, value)
       return
     }
 
@@ -71,6 +58,21 @@ class LLVM_Engine
 
   def define_string(str)
     @builder.global_string_pointer(str)
+  end
+
+  def create_new_variable(inst, value)
+    if value.to_i > 0
+        ptr = @builder.alloca(INT)
+        @builder.store(LLVM::Int(value.to_i), ptr)
+        @type_map[inst.variable] = "int"
+        ptr
+      else
+        alloc = @builder.alloca(PCHAR)
+        ptr   = define_string(value)
+        @builder.store(@builder.gep(ptr, LLVM::Int(0)), alloc)
+        @type_map[inst.variable] = "string"
+        alloc
+      end
   end
 
   def variable_add(inst)

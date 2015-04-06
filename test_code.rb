@@ -87,7 +87,7 @@ describe Interpreter do
   it "can evaluate an if expression" do
     syntax_tree = get_ast('
     abc = "AAA"
-    if 100 > 15 { abc = "CCC" }
+    if 10 > 15 { abc = "CCC" }
     puts(abc)')
 
     Interpreter.new(syntax_tree)
