@@ -21,7 +21,7 @@ class Lexer
   end
 
   def find_number
-    result = @buffer.scan(/\d+/)
+    @buffer.scan(/\d+/)
   end
 
   def find_string
