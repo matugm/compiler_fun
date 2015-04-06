@@ -199,7 +199,7 @@ class LLVM_Engine
 
   def run
     @builder.ret(LLVM::Int(0))
-    llvm_output
+    #llvm_output
 
     LLVM.init_jit
     ee = JITCompiler.new(@mod)
