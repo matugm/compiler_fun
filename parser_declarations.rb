@@ -18,6 +18,7 @@ end
 
 class ASSIGNMENT
   attr_reader :variable, :value
+
   def initialize(variable, value)
     @variable = variable
     @value    = value
@@ -25,8 +26,9 @@ class ASSIGNMENT
 end
 
 class ASSIGNMENT_ADDITION
-  attr_reader :variable, :value
+  attr_reader   :variable
   attr_accessor :value
+
   def initialize(variable, value)
     @variable = variable
     @value    = value
@@ -34,8 +36,9 @@ class ASSIGNMENT_ADDITION
 end
 
 class ASSIGNMENT_SUBSTRACTION
-  attr_reader :variable, :value
+  attr_reader   :variable
   attr_accessor :value
+
   def initialize(variable, value)
     @variable = variable
     @value    = value
@@ -44,6 +47,7 @@ end
 
 class FUNCTION_CALL
   attr_reader :function, :argument
+
   def initialize(function, argument)
     @function = function
     @argument = argument

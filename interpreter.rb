@@ -14,7 +14,7 @@ class Interpreter
   end
 
   def get_from_symbol_table(input)
-    @symbol_table.fetch(input) {  }
+    @symbol_table.fetch(input)
   end
 
   def exec_from_symbol_table(input)

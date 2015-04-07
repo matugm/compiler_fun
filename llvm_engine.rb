@@ -98,7 +98,7 @@ class LLVM_Engine
     if @type_map[var_name] == "int"
       convert_to_string(ptr)
     else
-       @builder.load(ptr)
+      @builder.load(ptr)
     end
   end
 
@@ -110,16 +110,18 @@ class LLVM_Engine
     func = @mod.functions.named(name)
     ptr  = fetch_local(args.first)
 
-    if name == "puts"
+    if name == 'puts'
       str = prepare_for_puts(ptr, args.first)
       @builder.call(func, str)
     else
-      val  = @builder.load(ptr)
+      val = @builder.load(ptr)
       @builder.call(func, val)
     end
   end
 
-  # Dereferences pointer to value
+  # Dereferences pointer -> value
+  # This uses a 'raw' token from the lexer,
+  # and that's why we have to use .content
   def get_value(val)
     if val.is_a? IDENTIFIER
       var = fetch_local(val.content)
@@ -155,6 +157,7 @@ class LLVM_Engine
     @builder = builder_from_block(@after_block)
   end
 
+  # cond(cond, iftrue, iffalse) -> LLVM::Instruction
   def evaluate_while(input)
     cmp = evaluate_condition(input)
 
@@ -166,8 +169,7 @@ class LLVM_Engine
     @builder = builder_from_block(@true_block)
   end
 
-  # icmp(pred, lhs, rhs, name = "") ⇒ LLVM::Instruction
-  # cond(cond, iftrue, iffalse) ⇒ LLVM::Instruction
+  # icmp(pred, lhs, rhs, name = "") -> LLVM::Instruction
   def evaluate_condition(input)
     @condition_block = get_block('condition_block')
     @builder.br(@condition_block)
