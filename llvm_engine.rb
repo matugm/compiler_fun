@@ -87,14 +87,12 @@ class LLVM_Engine
   end
 
   def convert_to_string(val)
-    alloca = @builder.alloca(PCHAR, "char_pointer")
-    ptr    = @builder.load(alloca)
-
+    alloca = @builder.array_alloca(CHAR, LLVM::Int(50), "char_pointer")
     func   = @mod.functions.named("sprintf")
+    val    = @builder.load(val)
 
-    val  = @builder.load(val)
-    @builder.call(func, ptr, str_format, val)
-    ptr
+    @builder.call(func, alloca, str_format, val)
+    alloca
   end
 
   def prepare_for_puts(ptr, var_name)
