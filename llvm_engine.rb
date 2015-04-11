@@ -82,12 +82,15 @@ class LLVM_Engine
     @builder.store(new_val, ptr)
   end
 
+  def str_format
+    @format ||= define_string("%d")
+  end
+
   def convert_to_string(val)
     alloca = @builder.alloca(PCHAR, "char_pointer")
     ptr    = @builder.load(alloca)
 
     func   = @mod.functions.named("sprintf")
-    str_format = define_string("%d")
 
     val  = @builder.load(val)
     @builder.call(func, ptr, str_format, val)
