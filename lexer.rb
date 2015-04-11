@@ -72,7 +72,7 @@ class Lexer
     when '"' then STRING.new(find_string)
     when /[0-9]/    then NUMBER.new(find_number)
     when /[a-zA-Z]/ then find_keyword_or_identifier
-    else abort "Invalid syntax at position #{@buffer.pos} '#{peek}'"
+    else abort "Lexer: Invalid syntax at position #{@buffer.pos} '#{@buffer.inspect}'"
     end
   end
 end

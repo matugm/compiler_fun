@@ -1,30 +1,35 @@
 
 require_relative 'token_declarations'
 require_relative 'parser_declarations'
-require_relative 'test_code'
 
 require_relative 'lexer'
 require_relative 'parser'
-require_relative 'interpreter'
+require_relative 'llvm_interpreter'
 
-# @tokens = [...objects...]
-# symbolos > strings (peek == "") > numeros > letras (keyword / identifier)
-# 1 clase por token
+require 'strscan'
+
+####################
+# Read input file
+####################
+
+lines = File.readlines(ARGV[0])
+@buffer = StringScanner.new(lines.join.strip)
 
 ##########################################
 # Scan source code for tokens
-###########################################
+##########################################
 
 @tokens = Lexer.new(@buffer).tokens
-p @tokens
+# puts "\n******** lexer output *********\n\n"
+# p @tokens
 
 ##########################################
 # Parser starts here (recursive-descent)
-###########################################
+##########################################
 
 @syntax_tree = Parser.new(@tokens).parse_all
-puts "\n******** output *********\n\n"
-p @syntax_tree
+# puts "\n******** parser output *********\n\n"
+# p @syntax_tree
 
 ################################
 # Interpreter starts here

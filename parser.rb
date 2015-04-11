@@ -45,7 +45,7 @@ class Parser
     ast = []
     while @tokens.any?
       expression = tag
-      abort "Parsing error, no valid expression found:\n #{ast} \n\n #{@tokens}" unless expression
+      abort "Parsing error, no valid expression found.\n AST: #{ast} \n\n Remaining tokens: #{@tokens}" unless expression
       ast << expression
     end
     print_tree(ast) if @debug
