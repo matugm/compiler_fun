@@ -2,6 +2,8 @@ class Parser
   def initialize(tokens)
     @tokens = tokens
     @debug  = false
+
+    TokenSequence.parser = self
   end
 
   def print_tree(ast)
@@ -83,29 +85,29 @@ class Parser
   end
 
   def find_function_call
-    if (tokens = TokenSequence.find(self, IDENTIFIER, OPENING_PARAMS, IDENTIFIER, CLOSING_PARAMS))
+    if (tokens = TokenSequence.find(IDENTIFIER, OPENING_PARAMS, IDENTIFIER, CLOSING_PARAMS))
       FUNCTION_CALL.new(tokens[0], tokens[2])
     end
   end
 
   def find_assignment
-    if (tokens = TokenSequence.find(self, IDENTIFIER, SINGLE_EQUALS, NUMBER))
+    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS, NUMBER))
       return ASSIGNMENT.new(tokens[0], tokens[2])
     end
 
-    if (tokens = TokenSequence.find(self, IDENTIFIER, SINGLE_EQUALS, STRING))
+    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS, STRING))
       return ASSIGNMENT.new(tokens[0], tokens[2])
     end
   end
 
   def find_assignment_addition
-    if (tokens = TokenSequence.find(self, IDENTIFIER, PLUS_EQUALS, NUMBER))
+    if (tokens = TokenSequence.find(IDENTIFIER, PLUS_EQUALS, NUMBER))
       ASSIGNMENT_ADDITION.new(tokens[0], tokens[2])
     end
   end
 
   def find_assignment_substraction
-    if (tokens = TokenSequence.find(self, IDENTIFIER, MINUS_EQUALS, NUMBER))
+    if (tokens = TokenSequence.find(IDENTIFIER, MINUS_EQUALS, NUMBER))
       ASSIGNMENT_SUBSTRACTION.new(tokens[0], tokens[2])
     end
   end
@@ -117,13 +119,18 @@ class Parser
 end
 
 class TokenSequence
-  def self.find(parser, *tokens)
+  def self.parser=(parser)
+    @parser = parser
+  end
+
+  def self.find(*tokens)
+    abort "Parser not set" unless @parser
 
     found =
     tokens.each_with_index.all? do |t, idx|
-      parser.look_ahead(t, idx)
+      @parser.look_ahead(t, idx)
     end
 
-    tokens.map { |t| parser.term(t) } if found
+    tokens.map { |t| @parser.term(t) } if found
   end
 end
