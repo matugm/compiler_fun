@@ -11,6 +11,10 @@ class Parser
     p ast
   end
 
+  def current_token
+    @tokens.first
+  end
+
   def term(tok)
     current = @tokens.shift
     abort "Parser: nil token found" unless current
@@ -47,7 +51,7 @@ class Parser
     ast = []
     while @tokens.any?
       expression = tag
-      abort "Parsing error, no valid expression found.\n AST: #{ast} \n\n Remaining tokens: #{@tokens}" unless expression
+      abort ParserError.invalid_expression(ast, @tokens) unless expression
       ast << expression
     end
     print_tree(ast) if @debug
@@ -116,6 +120,16 @@ class Parser
     term(IDENTIFIER)
   end
 
+end
+
+class ParserError
+  def self.syntax(t, parser)
+    "Syntax error: expected #{t} but got #{parser.current_token.inspect}\n #{parser.inspect}"
+  end
+
+  def self.invalid_expression(ast, tokens)
+    "Parsing error, no valid expression found.\n AST: #{ast} \n\n Remaining tokens: #{tokens}"
+  end
 end
 
 class TokenSequence
