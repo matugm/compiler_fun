@@ -89,29 +89,29 @@ class Parser
   end
 
   def find_function_call
-    if (tokens = TokenSequence.find(IDENTIFIER, OPENING_PARAMS, IDENTIFIER, CLOSING_PARAMS))
+    if (tokens = TokenSequence.find(IDENTIFIER, OPENING_PARAMS, IDENTIFIER).last(CLOSING_PARAMS))
       FUNCTION_CALL.new(tokens[0], tokens[2])
     end
   end
 
   def find_assignment
-    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS, NUMBER))
+    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS).last(NUMBER))
       return ASSIGNMENT.new(tokens[0], tokens[2])
     end
 
-    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS, STRING))
+    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS).last(STRING))
       return ASSIGNMENT.new(tokens[0], tokens[2])
     end
   end
 
   def find_assignment_addition
-    if (tokens = TokenSequence.find(IDENTIFIER, PLUS_EQUALS, NUMBER))
+    if (tokens = TokenSequence.find(IDENTIFIER, PLUS_EQUALS).last(NUMBER))
       ASSIGNMENT_ADDITION.new(tokens[0], tokens[2])
     end
   end
 
   def find_assignment_substraction
-    if (tokens = TokenSequence.find(IDENTIFIER, MINUS_EQUALS, NUMBER))
+    if (tokens = TokenSequence.find(IDENTIFIER, MINUS_EQUALS).last(NUMBER))
       ASSIGNMENT_SUBSTRACTION.new(tokens[0], tokens[2])
     end
   end
@@ -138,13 +138,20 @@ class TokenSequence
   end
 
   def self.find(*tokens)
+    @token_list = tokens
+    self
+  end
+
+  def self.last(last_token = nil)
     abort "Parser not set" unless @parser
+    @token_list << last_token
 
     found =
-    tokens.each_with_index.all? do |t, idx|
+    @token_list.each_with_index.all? do |t, idx|
       @parser.look_ahead(t, idx)
     end
 
-    tokens.map { |t| @parser.term(t) } if found
+    @token_list.map { |t| @parser.term(t) } if found
   end
+
 end
