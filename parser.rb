@@ -15,6 +15,10 @@ class Parser
     @tokens.first
   end
 
+  def token_at(idx)
+    @tokens[idx]
+  end
+
   def term(tok)
     current = @tokens.shift
     abort "Parser: nil token found" unless current
@@ -95,11 +99,7 @@ class Parser
   end
 
   def find_assignment
-    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS).last(NUMBER))
-      return ASSIGNMENT.new(tokens[0], tokens[2])
-    end
-
-    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS).last(STRING))
+    if (tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS).multi([NUMBER, STRING]))
       return ASSIGNMENT.new(tokens[0], tokens[2])
     end
   end
@@ -142,15 +142,32 @@ class TokenSequence
     self
   end
 
-  def self.last(last_token = nil)
+  def self.multi(token_array)
+    token_array.each do |t|
+      begin
+        check_tokens = last(t)
+      rescue ArgumentError
+      end
+      return check_tokens if check_tokens
+    end
+    false
+  end
+
+  def self.last(last_token)
     abort "Parser not set" unless @parser
-    @token_list << last_token
 
     found =
     @token_list.each_with_index.all? do |t, idx|
       @parser.look_ahead(t, idx)
     end
 
+    return false unless found
+
+    # Check last token
+    found = (found && @parser.look_ahead(last_token, @token_list.size)) or
+      raise ArgumentError.new "error: expected #{last_token} but got #{@parser.token_at(@token_list.size).class}"
+
+    @token_list << last_token
     @token_list.map { |t| @parser.term(t) } if found
   end
 

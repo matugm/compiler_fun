@@ -38,3 +38,24 @@ describe Parser do
     expect(syntax_tree[5].body.body).to be_a ASSIGNMENT
   end
 end
+
+require_relative '../token_declarations'
+require_relative '../lexer'
+
+describe TokenSequence do
+  before do
+    tokens = get_tokens("a = 1")
+    parser = Parser.new(tokens)
+    TokenSequence.parser = parser
+  end
+
+  it "can find a sequence of tokens" do
+    tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS).last(NUMBER)
+    expect(tokens.size).to eq 3
+  end
+
+  it "can work with optional tokens" do
+    tokens = TokenSequence.find(IDENTIFIER, SINGLE_EQUALS).multi([NUMBER, STRING])
+    expect(tokens.size).to eq 3
+  end
+end
