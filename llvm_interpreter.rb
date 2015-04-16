@@ -1,6 +1,6 @@
 require_relative 'llvm_engine'
 
-class Interpreter
+class LLVM_Interpreter
 
   def execute
     instruction = @syntax_tree.shift

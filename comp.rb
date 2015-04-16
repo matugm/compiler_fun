@@ -35,4 +35,4 @@ lines = File.readlines(ARGV[0])
 # Interpreter starts here
 ################################
 
-Interpreter.new(@syntax_tree)
+LLVM_Interpreter.new(@syntax_tree)

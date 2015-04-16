@@ -119,7 +119,6 @@ class Parser
   def tag99
     term(IDENTIFIER)
   end
-
 end
 
 class ParserError
@@ -170,5 +169,4 @@ class TokenSequence
     @token_list << last_token
     @token_list.map { |t| @parser.term(t) } if found
   end
-
 end
