@@ -2,6 +2,6 @@
 test = 100
 msg  = "ok"
 
-if 100 > 50 {
+if test > 50 {
   puts(msg)
 }
