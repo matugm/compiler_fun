@@ -14,30 +14,30 @@ class LLVM_Interpreter
       @engine.variable_add(instruction)
     end
 
+    if instruction.is_a? ASSIGNMENT_SUBSTRACTION
+      @engine.variable_sub(instruction)
+    end
+
     if instruction.is_a? FUNCTION_CALL
       @engine.execute_method(instruction.function, instruction.argument)
     end
 
     if instruction.is_a? IF_STATEMENT
       @engine.evaluate_if(instruction)
-      @syntax_tree.unshift(instruction.body)
-      @depth = true and return
+      instruction.body.reverse.each { |i| @syntax_tree.unshift(i) }
     end
 
     if instruction.is_a? WHILE_STATEMENT
       @engine.evaluate_while(instruction)
-      @syntax_tree.unshift(instruction.body)
-      @while = true and return
+      instruction.body.reverse.each { |i| @syntax_tree.unshift(i) }
     end
 
-    if @depth
+    if instruction == :END_IF
       @engine.end_block
-      @depth = false
     end
 
-    if @while
+    if instruction == :END_WHILE
       @engine.end_while
-      @while = false
     end
   end
 

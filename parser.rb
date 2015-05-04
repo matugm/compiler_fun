@@ -73,10 +73,11 @@ class Parser
   def find_if
     if term("if")
       t = IF_STATEMENT.new(find_condition)
+      t.body = []
 
-      t.body = tag
+      t.body << tag until term(CLOSING_BRACER)
+      t.body << :END_IF
 
-      term(CLOSING_BRACER)
       return t
     end
   end
@@ -84,10 +85,11 @@ class Parser
   def find_while
     if term("while")
       t = WHILE_STATEMENT.new(find_condition)
+      t.body = []
 
-      t.body = tag
+      t.body << tag until term(CLOSING_BRACER)
+      t.body << :END_WHILE
 
-      term(CLOSING_BRACER)
       return t
     end
   end

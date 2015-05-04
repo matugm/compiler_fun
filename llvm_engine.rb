@@ -82,6 +82,13 @@ class LLVM_Engine
     @builder.store(new_val, ptr)
   end
 
+  def variable_sub(inst)
+    ptr = @locals.fetch(inst.variable)
+    val = @builder.load(ptr)
+    new_val = @builder.sub(val, LLVM::Int(inst.value.to_i))
+    @builder.store(new_val, ptr)
+  end
+
   def str_format
     @format ||= define_string("%d")
   end

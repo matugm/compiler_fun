@@ -12,4 +12,9 @@ describe LLVM_Interpreter do
     output = `ruby comp.rb samples/conditionals.g`
     expect(output).to eq "ok\n"
   end
+
+  it "can evaluate loops" do
+    output = `ruby comp.rb samples/loops.g`
+    expect(output).to eq "hello\nhello\nhello\n"
+  end
 end

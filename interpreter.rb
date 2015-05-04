@@ -69,14 +69,14 @@ class Interpreter
 
     if instruction.is_a? IF_STATEMENT
       bool = evaluate_condition(instruction)
-      @syntax_tree.unshift(instruction.body) if bool
+      instruction.body.each { |i| @syntax_tree.unshift(i) } if bool
     end
 
     if instruction.is_a? WHILE_STATEMENT
       bool = evaluate_condition(instruction)
       if bool
         @syntax_tree.unshift(instruction)
-        @syntax_tree.unshift(instruction.body)
+        instruction.body.each { |i| @syntax_tree.unshift(i) }
       end
     end
   end

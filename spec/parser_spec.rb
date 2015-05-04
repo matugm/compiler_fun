@@ -34,8 +34,8 @@ describe Parser do
     expect(syntax_tree[3]).to be_a ASSIGNMENT_ADDITION
     expect(syntax_tree[4]).to be_a FUNCTION_CALL
     expect(syntax_tree[5]).to be_a IF_STATEMENT
-    expect(syntax_tree[5].body).to be_a WHILE_STATEMENT
-    expect(syntax_tree[5].body.body).to be_a ASSIGNMENT
+    expect(syntax_tree[5].body[0]).to be_a WHILE_STATEMENT
+    expect(syntax_tree[5].body[0].body[0]).to be_a ASSIGNMENT
   end
 end
 
